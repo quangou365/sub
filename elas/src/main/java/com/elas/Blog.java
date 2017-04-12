@@ -1,6 +1,7 @@
 package com.elas;
 
 public class Blog {
+	/***id**/
 	 private Integer id;
 	    private String title;
 	    private String posttime;
