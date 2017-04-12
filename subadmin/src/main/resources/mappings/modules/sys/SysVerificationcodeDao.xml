@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.sys.dao.SysVerificationcodeDao">
+    
+	<sql id="sysVerificationcodeColumns">
+		a.verification_code AS "verificationCode",
+		a.mobile AS "mobile",
+		a.number AS "number",
+		a.push_time AS "pushTime",
+		a.id AS "id"
+	</sql>
+	
+	<sql id="sysVerificationcodeJoins">
+	</sql>
+    
+	<select id="get" resultType="SysVerificationcode">
+		SELECT 
+			<include refid="sysVerificationcodeColumns"/>
+		FROM sys_verificationcode a
+		<include refid="sysVerificationcodeJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="SysVerificationcode">
+		SELECT 
+			<include refid="sysVerificationcodeColumns"/>
+		FROM sys_verificationcode a
+		<include refid="sysVerificationcodeJoins"/>
+		<where>
+			
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="SysVerificationcode">
+		SELECT 
+			<include refid="sysVerificationcodeColumns"/>
+		FROM sys_verificationcode a
+		<include refid="sysVerificationcodeJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="checkCode" resultType="SysVerificationcode">
+		select * from sys_verificationcode 
+		where push_time=( select max(push_time) from sys_verificationcode 
+		where mobile=#{mobile} and verification_code=#{verificationCode} and  STR_TO_DATE(push_time,'%Y%m%d%H%i%s')>=CURRENT_TIMESTAMP - INTERVAL 10 MINUTE)
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO sys_verificationcode(
+			verification_code,
+			mobile,
+			number,
+			push_time,
+			id
+		) VALUES (
+			#{verificationCode},
+			#{mobile},
+			#{number},
+			#{pushTime},
+			#{id}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE sys_verificationcode SET 	
+			verification_code = #{verificationCode},
+			mobile = #{mobile},
+			number = #{number},
+			push_time = #{pushTime}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM sys_verificationcode
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

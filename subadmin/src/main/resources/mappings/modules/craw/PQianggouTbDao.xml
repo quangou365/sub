@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.craw.dao.PQianggouTbDao">
+    
+	<sql id="pQianggouTbColumns">
+		a.id AS "id",
+		a.name AS "name",
+		a.pcurl AS "pcurl",
+		a.picurl AS "picurl",
+		a.url AS "url",
+		a.starttime AS "starttime",
+		a.endtime AS "endtime",
+		a.price AS "price",
+		a.saleprice AS "saleprice",
+		a.selfsellingpoint AS "selfsellingpoint",
+		a.category AS "category"
+	</sql>
+	
+	<sql id="pQianggouTbJoins">
+	</sql>
+    
+	<select id="get" resultType="PQianggouTb">
+		SELECT 
+			<include refid="pQianggouTbColumns"/>
+		FROM p_qianggou_tb a
+		<include refid="pQianggouTbJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="PQianggouTb">
+		SELECT 
+			<include refid="pQianggouTbColumns"/>
+		FROM p_qianggou_tb a
+		<include refid="pQianggouTbJoins"/>
+		<where>
+			
+			<if test="name != null and name != ''">
+				AND a.name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="PQianggouTb">
+		SELECT 
+			<include refid="pQianggouTbColumns"/>
+		FROM p_qianggou_tb a
+		<include refid="pQianggouTbJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<!-- 获取推送数据 -->
+	<select id="findPushList" resultType="com.thinkgem.jeesite.modules.craw.entity.PushBean">
+		select cm.id as categoryid, cm.mobile,cm.start_time AS "starttime",cm.end_time AS "endtime",pc.name as categoryname,pq.`name` pname ,min(pq.salePrice),pq.url
+		from catgory_mobile cm,p_category pc,p_qianggou_tb pq WHERE cm.category_id=pc.id 
+		and  locate(pc.`name`,pq.`name`)  and pq.salePrice between  price_min and price_max and cm.flag=0  GROUP BY mobile
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO p_qianggou_tb(
+			id,
+			name,
+			pcurl,
+			picurl,
+			url,
+			starttime,
+			endtime,
+			price,
+			saleprice,
+			selfsellingpoint,
+			category
+		) VALUES (
+			#{id},
+			#{name},
+			#{pcurl},
+			#{picurl},
+			#{url},
+			#{starttime},
+			#{endtime},
+			#{price},
+			#{saleprice},
+			#{selfsellingpoint},
+			#{category}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE p_qianggou_tb SET 	
+			name = #{name},
+			pcurl = #{pcurl},
+			picurl = #{picurl},
+			url = #{url},
+			starttime = #{starttime},
+			endtime = #{endtime},
+			price = #{price},
+			saleprice = #{saleprice},
+			selfsellingpoint = #{selfsellingpoint},
+			category = #{category}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="updatePushFlag">
+		UPDATE catgory_mobile SET 	
+			flag =1			
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM p_qianggou_tb
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

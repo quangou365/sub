@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.craw.dao.PCategoryDao">
+    
+	<sql id="pCategoryColumns">
+		a.type AS "type",
+		a.id AS "id",
+		a.name AS "name",
+		a.url AS "url",
+		a.remark AS "remark",
+		a.parent AS "parent",
+		a.level AS "level"
+	</sql>
+	
+	<sql id="pCategoryJoins">
+	</sql>
+    
+	<select id="get" resultType="PCategory">
+		select a.type AS "type",
+		a.id AS "id",
+		a.name AS "name",
+		a.url AS "url",
+		a.remark AS "remark",
+		a.parent AS "parent",
+		a.level AS "level",b.`name` as 'pname'  
+		from p_category a LEFT JOIN p_category b on a.parent=b.id	
+		<include refid="pCategoryJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="PCategory">
+		select a.type AS "type",
+		a.id AS "id",
+		a.name AS "name",
+		a.url AS "url",
+		a.remark AS "remark",
+		a.parent AS "parent",
+		a.level AS "level",b.`name` as 'pname'  
+		from p_category a LEFT JOIN p_category b on a.parent=b.id	
+		<include refid="pCategoryJoins"/>
+		<where>
+			
+			<if test="name != null and name != ''">
+				AND a.name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if><if test="parent != null and parent != ''">
+				AND a.parent = #{parent}
+			</if><if test="id != null and id != ''">
+				AND a.id = #{id}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	
+	<select id="findpList" resultType="PCategory">
+		SELECT 
+			<include refid="pCategoryColumns"/>
+		from p_category a where parent =(select parent from p_category where id=#{id} )		
+	</select>
+	
+	<select id="findParentList" resultType="PCategory">
+		select a.id,a.name,a.parent AS "parent",b.`name` as 'parent.name'  
+		from p_category a LEFT JOIN p_category b on a.parent=b.id	
+	</select>
+	
+	<select id="findAllList" resultType="PCategory">
+		SELECT 
+			<include refid="pCategoryColumns"/>
+		FROM p_category a
+		<include refid="pCategoryJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO p_category(
+			type,
+			id,
+			name,
+			url,
+			remark,
+			parent,
+			level
+		) VALUES (
+			#{type},
+			#{id},
+			#{name},
+			#{url},
+			#{remark},
+			#{parent},
+			#{level}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE p_category SET 	
+			type = #{type},
+			name = #{name},
+			url = #{url},
+			remark = #{remark},
+			parent = #{parent},
+			level = #{level}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM p_category
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

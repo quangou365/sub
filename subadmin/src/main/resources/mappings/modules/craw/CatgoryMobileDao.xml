@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.craw.dao.CatgoryMobileDao">
+    
+	<sql id="catgoryMobileColumns">
+		a.category_id AS "categoryId",
+		a.mobile AS "mobile",
+		a.start_time AS "startTime",
+		a.end_time AS "endTime",
+		a.flag AS "flag",
+		a.create_time AS "createTime",
+		a.price_min AS "priceMin",
+		a.price_max AS "priceMax",
+		a.id AS "id"
+	</sql>
+	
+	<sql id="catgoryMobileJoins">
+	</sql>
+    
+	<select id="get" resultType="CatgoryMobile">
+		SELECT 
+			<include refid="catgoryMobileColumns"/>
+		FROM catgory_mobile a
+		<include refid="catgoryMobileJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CatgoryMobile">
+		select pc.name as 'cname',cm.create_time,cm.price_min,cm.price_max
+		from catgory_mobile cm,p_category pc 
+		<include refid="catgoryMobileJoins"/>
+		<where>
+		     cm.category_id=pc.id 
+			<if test="mobile != null and mobile != ''">
+				AND cm.mobile = #{mobile}
+			</if>
+		</where>
+		ORDER BY create_time desc
+	</select>
+	
+	<select id="findAllList" resultType="CatgoryMobile">
+		SELECT 
+			<include refid="catgoryMobileColumns"/>
+		FROM catgory_mobile a
+		<include refid="catgoryMobileJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO catgory_mobile(
+			category_id,
+			mobile,
+			start_time,
+			end_time,
+			flag,
+			create_time,
+			price_min,
+			price_max,
+			id
+		) VALUES (
+			#{categoryId},
+			#{mobile},
+			#{startTime},
+			#{endTime},
+			#{flag},
+			#{createTime},
+			#{priceMin},
+			#{priceMax},
+			#{id}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE catgory_mobile SET 	
+			category_id = #{categoryId},
+			mobile = #{mobile},
+			start_time = #{startTime},
+			end_time = #{endTime},
+			flag = #{flag},
+			create_time = #{createTime},
+			price_min = #{priceMin},
+			price_max = #{priceMax}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM catgory_mobile
+		WHERE id = #{id}
+	</update>
+	
+</mapper>
