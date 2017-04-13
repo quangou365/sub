@@ -12,7 +12,7 @@ import org.elasticsearch.client.transport.TransportClient;
 /**
  * 修改API
  * @author wuyb
- *
+ * 2017/4/14
  */
 public class UpdateAPI {
 
